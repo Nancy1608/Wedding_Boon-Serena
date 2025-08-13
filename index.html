@@ -1,13 +1,11 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html><head>
-  <meta charset="UTF-8">
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wedding Guest List</title>
-
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wedding Guest List</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
   /* Sticky filter bar on mobile */
   .sticky-top {
     position: sticky;
@@ -23,12 +21,14 @@
     right: 1rem;
     z-index: 50;
   }
-  </style>
-</head><body class="bg-white text-gray-800">
+</style>
+</head>
+<body class="bg-white text-gray-800">
 
 <div class="max-w-6xl mx-auto p-4">
   <!-- Search -->
-  <input id="searchInput" placeholder="Search by name or table..." class="w-full p-2 mb-3 border rounded" type="text">
+  <input id="searchInput" type="text" placeholder="Search by name or table..."
+         class="w-full p-2 mb-3 border rounded">
 
   <!-- Filter Buttons -->
   <div class="sticky-top flex gap-2 overflow-x-auto">
@@ -38,7 +38,7 @@
   </div>
 
   <!-- Mobile Card View -->
-  
+  <div id="cardContainer" class="md:hidden mt-4 space-y-3"></div>
 
   <!-- Desktop Table View -->
   <div class="hidden md:block mt-4 overflow-x-auto">
@@ -57,71 +57,71 @@
   </div>
 </div>
 
-
 <!-- Floating Reset Button on Mobile -->
-<button onclick="revertAll()" class="fab md:hidden bg-red-500 text-white px-4 py-3 rounded-full shadow-lg">Reset All</button>
+<button onclick="revertAll()"
+        class="fab md:hidden bg-red-500 text-white px-4 py-3 rounded-full shadow-lg">Reset All</button>
 
-<script></script>
+<script>
 const guests = [
   { table: 20, pax: 4, name: "Boon's Friends" },
   { table: 20, pax: 6, name: "Serena's Friends" },
-  { table: 14, pax: 2, name: "Ming Ming &amp; Spouse" },
-  { table: 14, pax: 2, name: "Lee Kah Yee &amp; Spouse" },
-  { table: 14, pax: 1, name: "Ming Ming&#8217;s Aunty" },
+  { table: 14, pax: 2, name: "Ming Ming & Spouse" },
+  { table: 14, pax: 2, name: "Lee Kah Yee & Spouse" },
+  { table: 14, pax: 1, name: "Ming Ming’s Aunty" },
   { table: 14, pax: 1, name: "Mrs Lim Tua Lek" },
-  { table: 14, pax: 3, name: "Nicole Yap &amp; Family" },
-  { table: 8, pax: 2, name: "Mr &amp; Mrs Soon Chin Hoon" },
-  { table: 8, pax: 2, name: "Ong Ting Ting &amp; Spouse" },
-  { table: 8, pax: 2, name: "Mr &amp; Mrs Jesse Jee" },
-  { table: 8, pax: 2, name: "Mr &amp; Mrs Lee Peng Koon" },
-  { table: 8, pax: 2, name: "Mr &amp; Mrs Loh Hoi Yew" },
-  { table: 2, pax: 2, name: "Kian Mun &amp; Daughter" },
+  { table: 14, pax: 3, name: "Nicole Yap & Family" },
+  { table: 8, pax: 2, name: "Mr & Mrs Soon Chin Hoon" },
+  { table: 8, pax: 2, name: "Ong Ting Ting & Spouse" },
+  { table: 8, pax: 2, name: "Mr & Mrs Jesse Jee" },
+  { table: 8, pax: 2, name: "Mr & Mrs Lee Peng Koon" },
+  { table: 8, pax: 2, name: "Mr & Mrs Loh Hoi Yew" },
+  { table: 2, pax: 2, name: "Kian Mun & Daughter" },
   { table: 2, pax: 1, name: "Amy" },
-  { table: 2, pax: 3, name: "Benny &amp; Family" },
-  { table: 2, pax: 4, name: "Victor &amp; Family" },
+  { table: 2, pax: 3, name: "Benny & Family" },
+  { table: 2, pax: 4, name: "Victor & Family" },
   { table: 21, pax: 1, name: "Gurdeu" },
-  { table: 21, pax: 4, name: "Jasvin, Annish &amp; Family" },
-  { table: 21, pax: 3, name: "Sukhvinder &amp; Family" },
-  { table: 21, pax: 2, name: "Dato&#8217; &amp; Datin Jesbil" },
-  { table: 15, pax: 2, name: "Mr &amp; Mrs Chan (Joo Heong)" },
+  { table: 21, pax: 4, name: "Jasvin, Annish & Family" },
+  { table: 21, pax: 3, name: "Sukhvinder & Family" },
+  { table: 21, pax: 2, name: "Dato’ & Datin Jesbil" },
+  { table: 15, pax: 2, name: "Mr & Mrs Chan (Joo Heong)" },
   { table: 15, pax: 1, name: "Ricky Chan" },
-  { table: 15, pax: 2, name: "Liew Li Fong &amp; Spouse" },
-  { table: 15, pax: 2, name: "Tan Ai Tiang &amp; Spouse" },
+  { table: 15, pax: 2, name: "Liew Li Fong & Spouse" },
+  { table: 15, pax: 2, name: "Tan Ai Tiang & Spouse" },
   { table: 15, pax: 1, name: "Kevin Lau" },
-  { table: 15, pax: 2, name: "Mr &amp; Mrs Wong Yok Heng" },
-  { table: 9, pax: 10, name: "Seah Kiat Seng &amp; Family" },
-  { table: 3, pax: 3, name: "Lay Weng &amp; Family" },
-  { table: 3, pax: 6, name: "Carmen &amp; Family" },
+  { table: 15, pax: 2, name: "Mr & Mrs Wong Yok Heng" },
+  { table: 9, pax: 10, name: "Seah Kiat Seng & Family" },
+  { table: 3, pax: 3, name: "Lay Weng & Family" },
+  { table: 3, pax: 6, name: "Carmen & Family" },
   { table: 3, pax: 1, name: "Nancy" },
-  { table: 22, pax: 2, name: "Mr &amp; Mrs Loh Weng Cheong" },
-  { table: 22, pax: 2, name: "Mr &amp; Mrs Goh Keat Hoe" },
-  { table: 22, pax: 2, name: "Mr &amp; Mrs Eric Woh Pei Su" },
-  { table: 22, pax: 2, name: "Mr &amp; Mrs Francis Wong" },
+  { table: 22, pax: 2, name: "Mr & Mrs Loh Weng Cheong" },
+  { table: 22, pax: 2, name: "Mr & Mrs Goh Keat Hoe" },
+  { table: 22, pax: 2, name: "Mr & Mrs Eric Woh Pei Su" },
+  { table: 22, pax: 2, name: "Mr & Mrs Francis Wong" },
   { table: 22, pax: 1, name: "Lim Hong Guan" },
   { table: 22, pax: 1, name: "Ang Sing Hai" },
-  { table: 16, pax: 2, name: "Mr &amp; Mrs Sunny Phang" },
+  { table: 16, pax: 2, name: "Mr & Mrs Sunny Phang" },
   { table: 16, pax: 1, name: "Ms Eng Hui Mun" },
   { table: 16, pax: 1, name: "Ms Tan Yoke Lan" },
-  { table: 16, pax: 2, name: "Mr &amp; Mrs Ng Kim Siah" },
-  { table: 16, pax: 2, name: "Mr &amp; Mrs Yap Meow Sing" },
-  { table: 16, pax: 2, name: "Mr &amp; Mrs Lim Tow Poe" },
+  { table: 16, pax: 2, name: "Mr & Mrs Ng Kim Siah" },
+  { table: 16, pax: 2, name: "Mr & Mrs Yap Meow Sing" },
+  { table: 16, pax: 2, name: "Mr & Mrs Lim Tow Poe" },
   { table: 10, pax: 1, name: "Ms Soo Kah Huey" },
-  { table: 10, pax: 2, name: "Dato&#8217; &amp; Datin Soo Kah Eng" },
-  { table: 10, pax: 2, name: "Dato&#8217; &amp; Datin Lew Wai Koung" },
+  { table: 10, pax: 2, name: "Dato’ & Datin Soo Kah Eng" },
+  { table: 10, pax: 2, name: "Dato’ & Datin Lew Wai Koung" },
   { table: 10, pax: 1, name: "Datin Toh Bee Huan" },
-  { table: 10, pax: 2, name: "Mr &amp; Mrs Soo Hock Chuan" },
+  { table: 10, pax: 2, name: "Mr & Mrs Soo Hock Chuan" },
   { table: 10, pax: 1, name: "Mdm Lau Yoke Eng" },
   { table: 10, pax: 1, name: "Mdm Isabelle Fam" },
-  { table: 4, pax: 4, name: "Shirley &amp; Family" },
+  { table: 4, pax: 4, name: "Shirley & Family" },
   { table: 4, pax: 1, name: "Annie" },
   { table: 4, pax: 1, name: "Ruby" },
-  { table: 4, pax: 2, name: "Amy Tiew &amp; Ah Ngoh" },
-  { table: 4, pax: 2, name: "Mr &amp; Mrs Sunny Tiew" }
+  { table: 4, pax: 2, name: "Amy Tiew & Ah Ngoh" },
+  { table: 4, pax: 2, name: "Mr & Mrs Sunny Tiew" }
 ];
 
 // Load status from localStorage or default to pending
 let statusMap = JSON.parse(localStorage.getItem('guestStatus')) || {};
-guests.forEach(g =&gt; {
+guests.forEach(g => {
   if (!statusMap[g.name]) statusMap[g.name] = 'pending';
 });
 
@@ -130,32 +130,30 @@ function saveStatus() {
 }
 
 function renderGuests(list) {
-  const isMobile = window.innerWidth &lt; 768;
+  const isMobile = window.innerWidth < 768;
   const tableBody = document.getElementById('tableBody');
   const cardContainer = document.getElementById('cardContainer');
   tableBody.innerHTML = "";
   cardContainer.innerHTML = "";
 
-  list.forEach(guest =&gt; {
+  list.forEach(guest => {
     const status = statusMap[guest.name];
     if (isMobile) {
       // Card view
       const card = document.createElement('div');
       card.className = "p-4 border rounded shadow-sm flex justify-between items-center";
       card.innerHTML = `
-        
-<div>
+        <div>
           <div class="text-sm text-gray-500">Table ${guest.table}</div>
           <div class="font-bold">${guest.name}</div>
           <div class="text-sm text-gray-600">Pax: ${guest.pax}</div>
           <div class="mt-1 text-xs px-2 py-1 rounded ${status === 'arrived' ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'}">${status}</div>
         </div>
-
         <button class="px-3 py-1 rounded ${status === 'arrived' ? 'bg-yellow-500 text-white' : 'bg-green-500 text-white'}">
           ${status === 'arrived' ? 'Revert' : 'Arrived'}
         </button>
       `;
-      card.querySelector('button').onclick = () =&gt; {
+      card.querySelector('button').onclick = () => {
         statusMap[guest.name] = status === 'arrived' ? 'pending' : 'arrived';
         saveStatus();
         renderGuests(list);
@@ -165,6 +163,49 @@ function renderGuests(list) {
       // Table view
       const row = document.createElement('tr');
       row.innerHTML = `
-        ${guest.table}
-        ${guest.pax}
-        ${guest.name}</body></html>
+        <td class="border p-2">${guest.table}</td>
+        <td class="border p-2">${guest.pax}</td>
+        <td class="border p-2">${guest.name}</td>
+        <td class="border p-2 ${status === 'arrived' ? 'bg-green-200' : 'bg-yellow-200'}">${status}</td>
+        <td class="border p-2">
+          <button class="px-3 py-1 rounded ${status === 'arrived' ? 'bg-yellow-500 text-white' : 'bg-green-500 text-white'}">
+            ${status === 'arrived' ? 'Revert' : 'Arrived'}
+          </button>
+        </td>
+      `;
+      row.querySelector('button').onclick = () => {
+        statusMap[guest.name] = status === 'arrived' ? 'pending' : 'arrived';
+        saveStatus();
+        renderGuests(list);
+      };
+      tableBody.appendChild(row);
+    }
+  });
+}
+
+function filterGuests(type) {
+  let filtered = guests;
+  if (type === 'arrived') filtered = guests.filter(g => statusMap[g.name] === 'arrived');
+  if (type === 'pending') filtered = guests.filter(g => statusMap[g.name] === 'pending');
+  renderGuests(filtered);
+}
+
+function revertAll() {
+  guests.forEach(g => statusMap[g.name] = 'pending');
+  saveStatus();
+  renderGuests(guests);
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+  const term = this.value.trim().toLowerCase();
+  const filtered = guests.filter(g =>
+    g.name.toLowerCase().includes(term) || g.table.toString().includes(term)
+  );
+  renderGuests(filtered);
+});
+
+// Initial render
+renderGuests(guests);
+</script>
+</body>
+</html>
