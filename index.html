@@ -1,311 +1,266 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html><head>
-  
   <meta charset="utf-8">
 
-  
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Wedding Guest Seating &amp; Check-in</title>
+  <title>Wedding Guest Check-in</title>
 
-  
-  <!-- Tailwind (CDN) for quick, clean styling on GitHub Pages -->
-  
+
   <script src="https://cdn.tailwindcss.com"></script>
-  
   <style>
-    html, body { height: 100%; }
-    .chip { @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border; }
-    .chip-pending { @apply border-yellow-300 bg-yellow-50 text-yellow-800; }
-    .chip-arrived { @apply border-green-300 bg-green-50 text-green-800; }
-    .btn { @apply inline-flex items-center gap-2 px-3 py-2 rounded-xl border shadow-sm text-sm font-medium hover:shadow transition; }
-    .btn-primary { @apply bg-blue-600 text-white border-blue-600 hover:bg-blue-700; }
-    .btn-ghost { @apply bg-white text-slate-700 border-slate-200; }
-    .btn-danger { @apply bg-rose-600 text-white border-rose-600 hover:bg-rose-700; }
-    .btn-small { @apply px-2 py-1 rounded-lg text-xs; }
-    .tbl th { @apply text-left text-xs font-semibold text-slate-500 uppercase tracking-wider; }
-    .tbl td { @apply text-sm text-slate-800; }
-    .highlight { @apply bg-yellow-100; }
+  html, body { height: 100%; }
+  .status-chip {
+    @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  .status-pending { @apply border-yellow-300 bg-yellow-50 text-yellow-800; }
+  .status-arrived { @apply border-green-300 bg-green-50 text-green-800; }
+  .btn { @apply inline-flex items-center gap-2 px-3 py-2 rounded-xl border shadow-sm text-sm font-medium hover:shadow transition; }
+  .btn-primary { @apply bg-blue-600 text-white border-blue-600 hover:bg-blue-700; }
+  .btn-secondary { @apply bg-white text-slate-700 border-slate-300 hover:bg-slate-100; }
+  .btn-danger { @apply bg-red-600 text-white border-red-600 hover:bg-red-700; }
+  .btn-small { @apply px-2 py-1 rounded-lg text-xs; }
+  .sticky-top { position: sticky; top: 0; z-index: 50; background: white; }
+  .fade { transition: all 0.3s ease-in-out; }
+  /* Floating Reset button on mobile */
+  #resetFab { @apply fixed bottom-4 right-4 rounded-full p-4 shadow-lg border-2 border-red-600 bg-red-600 text-white md:hidden; }
   </style>
 </head><body class="bg-slate-50 text-slate-900">
-  <main class="max-w-6xl mx-auto p-4 md:p-8">
-    <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
-      </header></main>
-<div>
-        <h1 class="text-2xl md:text-3xl font-bold">Guest Seating &amp; Check-in</h1>
-        <p class="text-slate-600">Search guests, mark Arrived, and filter by status. Data persists in this browser.</p>
-      </div>
 
-
-      
-<div class="flex flex-wrap items-center gap-2">
-        <button id="filterAll" class="btn btn-ghost">See All</button>
-        <button id="filterArrived" class="btn btn-ghost">Arrived Only</button>
-        <button id="filterPending" class="btn btn-ghost">Pending Only</button>
-        <button id="resetAll" class="btn btn-danger">Revert All to Pending</button>
-      </div>
+<main class="max-w-6xl mx-auto p-4 md:p-8">
+  <!-- Header -->
+  <header class="mb-4">
+    </header></main>
+<h1 class="text-2xl md:text-3xl font-bold">Guest Check-in</h1>
 
     
+<p class="text-slate-600">Search, filter, and mark arrivals. Status is saved in this browser until you reset.</p>
 
-    <section class="mb-4 grid gap-3 md:grid-cols-3">
-      </section>
-<div class="flex items-center gap-2">
-        <input id="searchInput" placeholder="Search by guest or table&#8230;" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" type="text">
-        <button id="clearSearch" class="btn btn-ghost">Clear</button>
+  
+
+  <!-- Filter & Search Bar -->
+  
+<div class="sticky-top p-2 shadow-sm border-b border-slate-200 md:static md:p-0 md:shadow-none md:border-none">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+      <div class="flex flex-nowrap gap-2 overflow-x-auto">
+        <button id="filterAll" class="btn btn-secondary whitespace-nowrap">See All</button>
+        <button id="filterArrived" class="btn btn-secondary whitespace-nowrap">Arrived Only</button>
+        <button id="filterPending" class="btn btn-secondary whitespace-nowrap">Pending Only</button>
       </div>
-
-
-      
-<div class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-        <div class="text-xs text-slate-500">Guests Arrived</div>
-        <div id="countArrived" class="text-xl font-semibold">0</div>
-        <div id="paxArrived" class="text-sm text-slate-500">0 pax</div>
+      <div class="flex items-center gap-2 mt-2 md:mt-0">
+        <input id="searchInput" placeholder="Search by guest or table&#8230;" class="w-full md:w-64 rounded-xl border border-slate-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" type="text">
+        <button id="clearSearch" class="btn btn-secondary">Clear</button>
       </div>
+    </div>
+  </div>
 
 
-      
-<div class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-        <div class="text-xs text-slate-500">Guests Pending</div>
-        <div id="countPending" class="text-xl font-semibold">0</div>
-        <div id="paxPending" class="text-sm text-slate-500">0 pax</div>
-      </div>
+  <!-- Totals -->
+  <section class="grid gap-3 md:grid-cols-3 my-4">
+    </section>
+<div class="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+      <div class="text-xs text-slate-500">Guests Arrived</div>
+      <div id="countArrived" class="text-xl font-semibold">0</div>
+      <div id="paxArrived" class="text-sm text-slate-500">0 pax</div>
+    </div>
 
     
+<div class="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+      <div class="text-xs text-slate-500">Guests Pending</div>
+      <div id="countPending" class="text-xl font-semibold">0</div>
+      <div id="paxPending" class="text-sm text-slate-500">0 pax</div>
+    </div>
 
-    <section class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-      </section>
+  
+
+  <!-- Desktop Table -->
+  <section class="hidden md:block rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    </section>
 <div class="overflow-x-auto">
-        <table class="min-w-full tbl">
-          <thead class="bg-slate-50">
-            <tr>
-              <th class="px-4 py-3">Table</th>
-              <th class="px-4 py-3">Guest Name</th>
-              <th class="px-4 py-3">Pax</th>
-              <th class="px-4 py-3">Status</th>
-              <th class="px-4 py-3">Action</th>
-            </tr>
-          </thead>
-          <tbody id="guestBody"></tbody>
-        </table>
-      </div>
-
-      
-<div id="noResults" class="hidden p-6 text-center text-slate-500">No guests match your search/filter.</div>
+      <table class="min-w-full">
+        <thead class="bg-slate-50 sticky top-0">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Table</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Guest Name</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Pax</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Action</th>
+          </tr>
+        </thead>
+        <tbody id="guestTableBody"></tbody>
+      </table>
+    </div>
 
     
-  
+<div id="noResultsTable" class="hidden p-6 text-center text-slate-500">No guests match your search/filter.</div>
 
   
+
+  <!-- Mobile Card View -->
+  <section id="guestCardContainer" class="md:hidden space-y-3 mt-4"></section>
+  
+<div id="noResultsCard" class="hidden md:hidden p-6 text-center text-slate-500">No guests match your search/filter.</div>
+
+
+
+<!-- Floating Reset FAB on mobile -->
+<button id="resetFab" title="Revert All to Pending">&#8635;</button>
+
 <script>
-    // ====== Embedded data (from your Excel: A=Table, B=Pax, C=Name) ======
-    const GUESTS = [
-      { table: 20, pax: 4, name: `Boon's Friends` },
-      { table: 20, pax: 6, name: `Serena's Friends` },
-      { table: 14, pax: 2, name: `Ming Ming & Spouse` },
-      { table: 14, pax: 2, name: `Lee Kah Yee & Spouse` },
-      { table: 14, pax: 1, name: `Ming Ming&#8217;s Aunty` },
-      { table: 14, pax: 1, name: `Mrs Lim Tua Lek` },
-      { table: 14, pax: 3, name: `Nicole Yap & Family` },
-      { table: 8,  pax: 2, name: `Mr & Mrs Soon Chin Hoon` },
-      { table: 8,  pax: 2, name: `Ong Ting Ting & Spouse` },
-      { table: 8,  pax: 2, name: `Mr & Mrs Jesse Jee` },
-      { table: 8,  pax: 2, name: `Mr & Mrs Lee Peng Koon` },
-      { table: 8,  pax: 2, name: `Mr & Mrs Loh Hoi Yew` },
-      { table: 2,  pax: 2, name: `Kian Mun & Daughter` },
-      { table: 2,  pax: 1, name: `Amy` },
-      { table: 2,  pax: 3, name: `Benny & Family` },
-      { table: 2,  pax: 4, name: `Victor & Family` },
-      { table: 21, pax: 1, name: `Gurdeu` },
-      { table: 21, pax: 4, name: `Jasvin, Annish & Family` },
-      { table: 21, pax: 3, name: `Sukhvinder & Family` },
-      { table: 21, pax: 2, name: `Dato&#8217; & Datin Jesbil` },
-      { table: 15, pax: 2, name: `Mr & Mrs Chan (Joo Heong)` },
-      { table: 15, pax: 1, name: `Ricky Chan` },
-      { table: 15, pax: 2, name: `Liew Li Fong & Spouse` },
-      { table: 15, pax: 2, name: `Tan Ai Tiang & Spouse` },
-      { table: 15, pax: 1, name: `Kevin Lau` },
-      { table: 15, pax: 2, name: `Mr & Mrs Wong Yok Heng` },
-      { table: 9,  pax: 10, name: `Seah Kiat Seng & Family` },
-      { table: 3,  pax: 3,  name: `Lay Weng & Family` },
-      { table: 3,  pax: 6,  name: `Carmen & Family` },
-      { table: 3,  pax: 1,  name: `Nancy` },
-      { table: 22, pax: 2, name: `Mr & Mrs Loh Weng Cheong` },
-      { table: 22, pax: 2, name: `Mr & Mrs Goh Keat Hoe` },
-      { table: 22, pax: 2, name: `Mr & Mrs Eric Woh Pei Su` },
-      { table: 22, pax: 2, name: `Mr & Mrs Francis Wong` },
-      { table: 22, pax: 1, name: `Lim Hong Guan` },
-      { table: 22, pax: 1, name: `Ang Sing Hai` },
-      { table: 16, pax: 2, name: `Mr & Mrs Sunny Phang` },
-      { table: 16, pax: 1, name: `Ms Eng Hui Mun` },
-      { table: 16, pax: 1, name: `Ms Tan Yoke Lan` },
-      { table: 16, pax: 2, name: `Mr & Mrs Ng Kim Siah` },
-      { table: 16, pax: 2, name: `Mr & Mrs Yap Meow Sing` },
-      { table: 16, pax: 2, name: `Mr & Mrs Lim Tow Poe` },
-      { table: 10, pax: 1, name: `Ms Soo Kah Huey` },
-      { table: 10, pax: 2, name: `Dato&#8217; & Datin Soo Kah Eng` },
-      { table: 10, pax: 2, name: `Dato&#8217; & Datin Lew Wai Koung` },
-      { table: 10, pax: 1, name: `Datin Toh Bee Huan` },
-      { table: 10, pax: 2, name: `Mr & Mrs Soo Hock Chuan` },
-      { table: 10, pax: 1, name: `Mdm Lau Yoke Eng` },
-      { table: 10, pax: 1, name: `Mdm Isabelle Fam` },
-      { table: 4,  pax: 4, name: `Shirley & Family` },
-      { table: 4,  pax: 1, name: `Annie` },
-      { table: 4,  pax: 1, name: `Ruby` },
-      { table: 4,  pax: 2, name: `Amy Tiew & Ah Ngoh` },
-      { table: 4,  pax: 2, name: `Mr & Mrs Sunny Tiew` },
-    ].sort((a, b) => a.table - b.table || a.name.localeCompare(b.name));
+  const GUESTS = [
+    { table: 20, pax: 4, name: `Boon's Friends` },
+    { table: 20, pax: 6, name: `Serena's Friends` },
+    { table: 14, pax: 2, name: `Ming Ming & Spouse` },
+    { table: 14, pax: 2, name: `Lee Kah Yee & Spouse` },
+    { table: 14, pax: 1, name: `Ming Ming&#8217;s Aunty` },
+    { table: 14, pax: 1, name: `Mrs Lim Tua Lek` },
+    { table: 14, pax: 3, name: `Nicole Yap & Family` },
+    { table: 8,  pax: 2, name: `Mr & Mrs Soon Chin Hoon` },
+    { table: 8,  pax: 2, name: `Ong Ting Ting & Spouse` },
+    { table: 8,  pax: 2, name: `Mr & Mrs Jesse Jee` },
+    { table: 8,  pax: 2, name: `Mr & Mrs Lee Peng Koon` },
+    { table: 8,  pax: 2, name: `Mr & Mrs Loh Hoi Yew` },
+    { table: 2,  pax: 2, name: `Kian Mun & Daughter` },
+    { table: 2,  pax: 1, name: `Amy` },
+    { table: 2,  pax: 3, name: `Benny & Family` },
+    { table: 2,  pax: 4, name: `Victor & Family` },
+    { table: 21, pax: 1, name: `Gurdeu` },
+    { table: 21, pax: 4, name: `Jasvin, Annish & Family` },
+    { table: 21, pax: 3, name: `Sukhvinder & Family` },
+    { table: 21, pax: 2, name: `Dato&#8217; & Datin Jesbil` },
+    { table: 15, pax: 2, name: `Mr & Mrs Chan (Joo Heong)` },
+    { table: 15, pax: 1, name: `Ricky Chan` },
+    { table: 15, pax: 2, name: `Liew Li Fong & Spouse` },
+    { table: 15, pax: 2, name: `Tan Ai Tiang & Spouse` },
+    { table: 15, pax: 1, name: `Kevin Lau` },
+    { table: 15, pax: 2, name: `Mr & Mrs Wong Yok Heng` },
+    { table: 9,  pax: 10, name: `Seah Kiat Seng & Family` },
+    { table: 3,  pax: 3, name: `Lay Weng & Family` },
+    { table: 3,  pax: 6, name: `Carmen & Family` },
+    { table: 3,  pax: 1, name: `Nancy` },
+    { table: 22, pax: 2, name: `Mr & Mrs Loh Weng Cheong` },
+    { table: 22, pax: 2, name: `Mr & Mrs Goh Keat Hoe` },
+    { table: 22, pax: 2, name: `Mr & Mrs Eric Woh Pei Su` },
+    { table: 22, pax: 2, name: `Mr & Mrs Francis Wong` },
+    { table: 22, pax: 1, name: `Lim Hong Guan` },
+    { table: 22, pax: 1, name: `Ang Sing Hai` },
+    { table: 16, pax: 2, name: `Mr & Mrs Sunny Phang` },
+    { table: 16, pax: 1, name: `Ms Eng Hui Mun` },
+    { table: 16, pax: 1, name: `Ms Tan Yoke Lan` },
+    { table: 16, pax: 2, name: `Mr & Mrs Ng Kim Siah` },
+    { table: 16, pax: 2, name: `Mr & Mrs Yap Meow Sing` },
+    { table: 16, pax: 2, name: `Mr & Mrs Lim Tow Poe` },
+    { table: 10, pax: 1, name: `Ms Soo Kah Huey` },
+    { table: 10, pax: 2, name: `Dato&#8217; & Datin Soo Kah Eng` },
+    { table: 10, pax: 2, name: `Dato&#8217; & Datin Lew Wai Koung` },
+    { table: 10, pax: 1, name: `Datin Toh Bee Huan` },
+    { table: 10, pax: 2, name: `Mr & Mrs Soo Hock Chuan` },
+    { table: 10, pax: 1, name: `Mdm Lau Yoke Eng` },
+    { table: 10, pax: 1, name: `Mdm Isabelle Fam` },
+    { table: 4,  pax: 4, name: `Shirley & Family` },
+    { table: 4,  pax: 1, name: `Annie` },
+    { table: 4,  pax: 1, name: `Ruby` },
+    { table: 4,  pax: 2, name: `Amy Tiew & Ah Ngoh` },
+    { table: 4,  pax: 2, name: `Mr & Mrs Sunny Tiew` }
+  ].sort((a, b) => a.table - b.table || a.name.localeCompare(b.name));
 
-    // ====== Storage helpers (persist status in this browser) ======
-    const STORAGE_KEY = 'wedding_checkin_status_v1';
-    function loadStatus() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
-      catch { return {}; }
-    }
-    function saveStatus(map) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
-    }
-    function resetStatus() {
-      localStorage.removeItem(STORAGE_KEY);
-    }
+  const STORAGE_KEY = 'guest_checkin_status';
+  function loadStatus() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; } }
+  function saveStatus(map) { localStorage.setItem(STORAGE_KEY, JSON.stringify(map)); }
+  function resetStatus() { localStorage.removeItem(STORAGE_KEY); }
 
-    // Build a unique key for a guest (name + table safeguards against dupes)
-    const keyOf = g => `${g.name}__t${g.table}`;
+  const keyOf = g => `${g.name}__t${g.table}`;
+  let statusMap = loadStatus();
+  let filter = 'all';
+  let searchTerm = '';
 
-    // ====== State & rendering ======
-    let statusMap = loadStatus();          // { key: 'Arrived' | 'Pending' }
-    let filter = 'all';                    // 'all' | 'arrived' | 'pending'
-    let searchTerm = '';
+  const elTableBody = document.getElementById('guestTableBody');
+  const elCardContainer = document.getElementById('guestCardContainer');
+  const elNoTable = document.getElementById('noResultsTable');
+  const elNoCard = document.getElementById('noResultsCard');
 
-    const elBody = document.getElementById('guestBody');
-    const elNoResults = document.getElementById('noResults');
-    const elSearch = document.getElementById('searchInput');
-    const elClear = document.getElementById('clearSearch');
+  const elCountArrived = document.getElementById('countArrived');
+  const elPaxArrived = document.getElementById('paxArrived');
+  const elCountPending = document.getElementById('countPending');
+  const elPaxPending = document.getElementById('paxPending');
 
-    const elCountArrived = document.getElementById('countArrived');
-    const elPaxArrived = document.getElementById('paxArrived');
-    const elCountPending = document.getElementById('countPending');
-    const elPaxPending = document.getElementById('paxPending');
+  function getStatus(g) { return statusMap[keyOf(g)] === 'Arrived' ? 'Arrived' : 'Pending'; }
+  function setStatus(g, status) { statusMap[keyOf(g)] = status; saveStatus(statusMap); render(); }
+  function toggleStatus(g) { setStatus(g, getStatus(g) === 'Arrived' ? 'Pending' : 'Arrived'); }
 
-    function getStatus(g) {
-      const s = statusMap[keyOf(g)];
-      return s === 'Arrived' ? 'Arrived' : 'Pending';
-    }
+  function matchesFilter(g) {
+    const s = getStatus(g);
+    if (filter === 'arrived' && s !== 'Arrived') return false;
+    if (filter === 'pending' && s !== 'Pending') return false;
+    if (!searchTerm) return true;
+    const q = searchTerm.toLowerCase();
+    return String(g.table) === q || g.name.toLowerCase().includes(q);
+  }
 
-    function setStatus(g, status) {
-      statusMap[keyOf(g)] = status;
-      saveStatus(statusMap);
-      render();
-    }
+  function render() {
+    let arrivedGuests = 0, pendingGuests = 0;
+    let arrivedPax = 0, pendingPax = 0;
+    elTableBody.innerHTML = '';
+    elCardContainer.innerHTML = '';
 
-    function toggleStatus(g) {
-      setStatus(g, getStatus(g) === 'Arrived' ? 'Pending' : 'Arrived');
-    }
+    const results = GUESTS.filter(matchesFilter);
+    results.forEach(g => {
+      const status = getStatus(g);
+      if (status === 'Arrived') { arrivedGuests++; arrivedPax += g.pax; } 
+      else { pendingGuests++; pendingPax += g.pax; }
 
-    function matchesFilter(g) {
-      const s = getStatus(g);
-      if (filter === 'arrived' && s !== 'Arrived') return false;
-      if (filter === 'pending' && s !== 'Pending') return false;
+      // Desktop row
+      const tr = document.createElement('tr');
+      tr.className = 'odd:bg-white even:bg-slate-50 fade';
+      tr.innerHTML = `
+        <td class="px-4 py-3 font-semibold">${g.table}</td>
+        <td class="px-4 py-3">${g.name}</td>
+        <td class="px-4 py-3">${g.pax}</td>
+        <td class="px-4 py-3"><span class="status-chip ${status === 'Arrived' ? 'status-arrived' : 'status-pending'}">${status}</span></td>
+        <td class="px-4 py-3">
+          <button class="btn btn-small ${status === 'Arrived' ? 'btn-secondary' : 'btn-primary'}">${status === 'Arrived' ? 'Revert to Pending' : 'Mark Arrived'}</button>
+        </td>
+      `;
+      tr.querySelector('button').onclick = () => toggleStatus(g);
+      elTableBody.appendChild(tr);
 
-      if (!searchTerm) return true;
-      const q = searchTerm.toLowerCase();
-
-      // match table exact or partial name match
-      const tableMatch = String(g.table) === q;
-      const nameMatch = g.name.toLowerCase().includes(q);
-      return tableMatch || nameMatch;
-    }
-
-    function render() {
-      // totals
-      let arrivedGuests = 0, pendingGuests = 0;
-      let arrivedPax = 0, pendingPax = 0;
-
-      // rows
-      elBody.innerHTML = '';
-      const frag = document.createDocumentFragment();
-
-      const results = GUESTS.filter(matchesFilter);
-
-      results.forEach(g => {
-        const status = getStatus(g);
-        if (status === 'Arrived') { arrivedGuests++; arrivedPax += g.pax; }
-        else { pendingGuests++; pendingPax += g.pax; }
-
-        const tr = document.createElement('tr');
-        tr.className = 'odd:bg-white even:bg-slate-50';
-
-        const tdTable = document.createElement('td');
-        tdTable.className = 'px-4 py-3 font-semibold';
-        tdTable.textContent = g.table;
-
-        const tdName = document.createElement('td');
-        tdName.className = 'px-4 py-3';
-        tdName.textContent = g.name;
-
-        const tdPax = document.createElement('td');
-        tdPax.className = 'px-4 py-3';
-        tdPax.textContent = g.pax;
-
-        const tdStatus = document.createElement('td');
-        tdStatus.className = 'px-4 py-3';
-        const chip = document.createElement('span');
-        chip.className = `chip ${status === 'Arrived' ? 'chip-arrived' : 'chip-pending'}`;
-        chip.textContent = status;
-        tdStatus.appendChild(chip);
-
-        const tdAction = document.createElement('td');
-        tdAction.className = 'px-4 py-3';
-        const btn = document.createElement('button');
-        btn.className = `btn btn-small ${status === 'Arrived' ? 'btn-ghost' : 'btn-primary'}`;
-        btn.textContent = status === 'Arrived' ? 'Revert to Pending' : 'Mark Arrived';
-        btn.onclick = () => toggleStatus(g);
-        tdAction.appendChild(btn);
-
-        tr.append(tdTable, tdName, tdPax, tdStatus, tdAction);
-        frag.appendChild(tr);
-      });
-
-      elBody.appendChild(frag);
-      elNoResults.classList.toggle('hidden', results.length > 0);
-
-      // Update totals
-      elCountArrived.textContent = arrivedGuests;
-      elPaxArrived.textContent = `${arrivedPax} pax`;
-      elCountPending.textContent = pendingGuests;
-      elPaxPending.textContent = `${pendingPax} pax`;
-    }
-
-    // ====== Events ======
-    document.getElementById('filterAll').addEventListener('click', () => { filter = 'all'; render(); });
-    document.getElementById('filterArrived').addEventListener('click', () => { filter = 'arrived'; render(); });
-    document.getElementById('filterPending').addEventListener('click', () => { filter = 'pending'; render(); });
-
-    document.getElementById('resetAll').addEventListener('click', () => {
-      if (confirm('Revert ALL guests to Pending? This clears the saved status on this browser.')) {
-        resetStatus();
-        statusMap = {};
-        render();
-      }
+      // Mobile card
+      const card = document.createElement('div');
+      card.className = 'bg-white rounded-xl border border-slate-200 shadow-sm p-4 fade';
+      card.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <div class="text-lg font-bold">Table ${g.table}</div>
+          <span class="status-chip ${status === 'Arrived' ? 'status-arrived' : 'status-pending'}">${status}</span>
+        </div>
+        <div class="font-medium text-slate-800 mb-1">${g.name}</div>
+        <div class="text-sm text-slate-500 mb-3">${g.pax} pax</div>
+        <button class="w-full btn ${status === 'Arrived' ? 'btn-secondary' : 'btn-primary'}">${status === 'Arrived' ? 'Revert to Pending' : 'Mark Arrived'}</button>
+      `;
+      card.querySelector('button').onclick = () => toggleStatus(g);
+      elCardContainer.appendChild(card);
     });
 
-    elSearch.addEventListener('input', (e) => {
-      searchTerm = e.target.value.trim();
-      render();
-    });
-    elClear.addEventListener('click', () => {
-      elSearch.value = '';
-      searchTerm = '';
-      render();
-    });
+    elNoTable.classList.toggle('hidden', results.length > 0);
+    elNoCard.classList.toggle('hidden', results.length > 0);
 
-    // Initial render
-    render();
+    elCountArrived.textContent = arrivedGuests;
+    elPaxArrived.textContent = `${arrivedPax} pax`;
+    elCountPending.textContent = pendingGuests;
+    elPaxPending.textContent = `${pendingPax} pax`;
+  }
 
-    // --- Optional: press "/" to focus search quickly
-    window.addEventListener('keydown', (e) => {
-      if (e.key === '/' && document.activeElement !== elSearch) {
-        e.preventDefault();
-        elSearch.focus();
-      }
-    });
-  </script>
+  // Filters
+  document.getElementById('filterAll').onclick = () => { filter = 'all'; render(); };
+  document.getElementById('filterArrived').onclick = () => { filter = 'arrived'; render(); };
+  document.getElementById('filterPending').onclick = () => { filter = 'pending'; render(); };
+
+  document.getElementById('resetFab').onclick = () => {
+    if (confirm('Revert ALL guests to Pending?')) { resetStatus(); statusMap = {}; render(); }
+  };
+
+  document.getElementById('searchInput').oninput = e => { searchTerm = e.target.value.trim(); render(); };
+  document.getElementById('clearSearch').onclick = () => { document.getElementById('searchInput').value = ''; searchTerm = ''; render(); };
+
+  render();
+</script>
 </body></html>
