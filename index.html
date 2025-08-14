@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,189 +5,140 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wedding Guest List</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        background-color: white;
-        color: #333;
-    }
-    header {
-        padding: 10px;
-        background: white;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        border-bottom: 1px solid #ddd;
-    }
-    .top-row, .second-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-        margin-bottom: 5px;
-    }
-    button {
-        padding: 8px 12px;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-        font-size: 14px;
-    }
-    .filter-btn {
-        background-color: gold;
-        color: black;
-    }
-    .reset-btn {
-        background-color: red;
-        color: white;
-    }
-    .revert-btn {
-        background-color: #ccc;
-    }
-    input[type="text"] {
-        padding: 8px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        flex: 1;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-    th {
-        background-color: #f5f5f5;
-    }
-    .card {
-        border: 1px solid #ddd;
-        padding: 10px;
-        border-radius: 5px;
-        margin-bottom: 10px;
-        background-color: white;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-    .status-btn {
-        padding: 5px 10px;
-        border-radius: 5px;
-        border: none;
-        cursor: pointer;
-    }
-    .arrived { background-color: #4CAF50; color: white; }
-    .pending { background-color: #f44336; color: white; }
-
-    @media (min-width: 768px) {
-        .card-view { display: none; }
-    }
-    @media (max-width: 767px) {
-        table { display: none; }
-    }
+body { font-family: Arial, sans-serif; background: #fff; margin: 0; padding: 0; }
+.container { padding: 10px; max-width: 1000px; margin: auto; }
+.filters-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+button { padding: 8px 12px; border: none; cursor: pointer; border-radius: 4px; }
+.arrived-btn { background: #4CAF50; color: white; }
+.pending-btn { background: #DAA520; color: black; } /* gold color */
+.clear-btn { background: red; color: white; border-radius: 50%; padding: 0 6px; cursor: pointer; font-weight: bold; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background-color: #f2f2f2; }
+.card { border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+@media (max-width: 768px) {
+table { display: none; }
+.card { display: block; }
+.filters-row { flex-direction: row; }
+}
+@media (min-width: 769px) {
+.card { display: none; }
+}
 </style>
 </head>
 <body>
+<div class="container">
 
-<header>
-    <div class="top-row">
-        <button class="filter-btn" onclick="filterGuests('all')">All</button>
-        <button class="filter-btn" onclick="filterGuests('arrived')">Arrived</button>
-        <button class="filter-btn" onclick="filterGuests('pending')">Pending</button>
-        <div id="totalPax" style="margin-left:auto; font-weight:bold;">Total Pax: 0</div>
-    </div>
-    <div class="second-row">
-        <input type="text" id="searchInput" placeholder="Search guest or table..." oninput="searchGuests()">
-        <button class="reset-btn" onclick="resetSearch()">X</button>
-        <button class="revert-btn" onclick="revertAll()">Revert All</button>
-    </div>
-</header>
+<!-- First row: filter buttons + total pax -->
+<div class="filters-row">
+    <button onclick="filterGuests('all')">All</button>
+    <button onclick="filterGuests('arrived')">Arrived</button>
+    <button onclick="filterGuests('pending')">Pending</button>
+    <div id="totalPax" style="margin-left: auto; font-weight: bold;"></div>
+</div>
 
-<main>
-    <table id="guestTable">
-        <thead>
-            <tr><th>Table No</th><th>Guest Name</th><th>No of Pax</th><th>Status</th><th>Action</th></tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <div id="guestCards" class="card-view"></div>
-</main>
+<!-- Second row: search + clear + revert -->
+<div class="filters-row">
+    <input id="search" placeholder="Search..." oninput="searchGuests()" type="text">
+    <span class="clear-btn" onclick="clearSearch()">×</span>
+    <button onclick="revertAll()">Revert All</button>
+</div>
+
+<table id="guestTable">
+<thead>
+<tr>
+<th>Table No</th>
+<th>Guest Name</th>
+<th>Pax</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<div id="guestCards"></div>
+</div>
 
 <script>
-const guestData = [
-    {table:20, pax:4, name:"Boon's Friends"},
-    {table:20, pax:6, name:"Serena's Friends"},
-    {table:14, pax:2, name:"Ming Ming & Spouse"},
-    {table:14, pax:2, name:"Lee Kah Yee & Spouse"},
-    {table:14, pax:1, name:"Ming Ming’s Aunty"},
-    {table:14, pax:1, name:"Mrs Lim Tua Lek"},
-    {table:14, pax:3, name:"Nicole Yap & Family"},
-    {table:8, pax:2, name:"Mr & Mrs Soon Chin Hoon"},
-    {table:8, pax:2, name:"Ong Ting Ting & Spouse"}
+let guests = [
+    [2, 2, 'Kian Mun & Daughter'],
+    [2, 1, 'Amy'],
+    [2, 3, 'Benny & Family'],
+    [2, 4, 'Victor & Family'],
+    [3, 3, 'Lay Weng & Family'],
+    [3, 6, 'Carmen & Family'],
+    [3, 1, 'Nancy'],
+    [4, 4, 'Shirley & Family'],
+    [4, 1, 'Annie'],
+    [4, 1, 'Ruby'],
+    [4, 2, 'Amy Tiew & Ah Ngoh'],
+    [4, 2, 'Mr & Mrs Sunny Tiew'],
+    [8, 2, 'Mr & Mrs Soon Chin Hoon'],
+    [8, 2, 'Ong Ting Ting & Spouse'],
+    [8, 2, 'Mr & Mrs Jesse Jee'],
+    [8, 2, 'Mr & Mrs Lee Peng Koon'],
+    [8, 2, 'Mr & Mrs Loh Hoi Yew'],
+    [9, 10, 'Seah Kiat Seng & Family']
 ];
 
-let guestStatus = JSON.parse(localStorage.getItem('guestStatus')) || {};
+let statusMap = JSON.parse(localStorage.getItem('guestStatus')) || {};
+let currentFilter = 'all';
 
-function renderGuests(filter='all', search='') {
+function saveStatus() {
+    localStorage.setItem('guestStatus', JSON.stringify(statusMap));
+}
+
+function updateDisplay() {
     const tbody = document.querySelector('#guestTable tbody');
-    const cardContainer = document.getElementById('guestCards');
+    const cardsContainer = document.getElementById('guestCards');
     tbody.innerHTML = '';
-    cardContainer.innerHTML = '';
-    let totalPax = 0;
-
-    guestData.forEach(g => {
-        const status = guestStatus[g.name] || 'pending';
-        if (filter !== 'all' && status !== filter) return;
-        if (search && !g.name.toLowerCase().includes(search) && g.table.toString() !== search) return;
-        totalPax += g.pax;
-
-        // Table row
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${g.table}</td>
-                        <td>${g.name} (Pax: ${g.pax})</td>
-                        <td>${g.pax}</td>
-                        <td>${status.charAt(0).toUpperCase() + status.slice(1)}</td>
-                        <td><button class="status-btn ${status}" onclick="toggleStatus('${g.name}')">${status === 'pending' ? 'Arr' : 'Pend'}</button></td>`;
-        tbody.appendChild(tr);
-
-        // Mobile card
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `<strong>Table ${g.table}</strong><br>${g.name} (Pax: ${g.pax})<br>
-                          <button class="status-btn ${status}" onclick="toggleStatus('${g.name}')">${status === 'pending' ? 'Arr' : 'Pend'}</button>`;
-        cardContainer.appendChild(card);
+    cardsContainer.innerHTML = '';
+    let searchTerm = document.getElementById('search').value.toLowerCase();
+    let filtered = guests.filter(g => {
+        let status = statusMap[g[2]] || 'pending';
+        let match = g[1].toString().includes(searchTerm) || g[2].toLowerCase().includes(searchTerm);
+        let passFilter = (currentFilter === 'all') || (currentFilter === status);
+        return match && passFilter;
     });
-    document.getElementById('totalPax').innerText = `Total Pax: ${totalPax}`;
+    let totalPax = 0;
+    filtered.forEach(g => {
+        let tableNo = g[0], pax = g[1], name = g[2];
+        let status = statusMap[name] || 'pending';
+        totalPax += pax;
+        let statusBtn = `<button class="${status==='arrived'?'arrived-btn':'pending-btn'}" onclick="toggleStatus('${name}')">${status==='arrived'?'Arrived':'Pending'}</button>`;
+        tbody.innerHTML += `<tr><td>${tableNo}</td><td>${name} (Pax: ${pax})</td><td>${pax}</td><td>${statusBtn}</td></tr>`;
+        cardsContainer.innerHTML += `<div class='card'><strong>Table:</strong> ${tableNo}<br><strong>Name:</strong> ${name} (Pax: ${pax})<br>${statusBtn}</div>`;
+    });
+    document.getElementById('totalPax').innerText = 'Total Pax: ' + totalPax;
 }
 
-function filterGuests(status) {
-    currentFilter = status;
-    renderGuests(status, document.getElementById('searchInput').value.toLowerCase());
-}
-
-function searchGuests() {
-    renderGuests(currentFilter, document.getElementById('searchInput').value.toLowerCase());
-}
-
-function resetSearch() {
-    document.getElementById('searchInput').value = '';
-    renderGuests(currentFilter);
+function filterGuests(f) {
+    currentFilter = f;
+    updateDisplay();
 }
 
 function toggleStatus(name) {
-    guestStatus[name] = guestStatus[name] === 'arrived' ? 'pending' : 'arrived';
-    localStorage.setItem('guestStatus', JSON.stringify(guestStatus));
-    renderGuests(currentFilter, document.getElementById('searchInput').value.toLowerCase());
+    statusMap[name] = statusMap[name] === 'arrived' ? 'pending' : 'arrived';
+    saveStatus();
+    updateDisplay();
 }
 
 function revertAll() {
-    guestStatus = {};
-    localStorage.removeItem('guestStatus');
-    renderGuests(currentFilter);
+    statusMap = {};
+    saveStatus();
+    updateDisplay();
 }
 
-let currentFilter = 'all';
-renderGuests();
-</script>
+function searchGuests() {
+    updateDisplay();
+}
 
+function clearSearch() {
+    document.getElementById('search').value = '';
+    updateDisplay();
+}
+
+updateDisplay();
+</script>
 </body>
 </html>
