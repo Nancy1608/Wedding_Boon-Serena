@@ -1,15 +1,10 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-  
-  <meta charset="UTF-8">
-
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wedding Guest List</title>
-
-  
-  
-  <style>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wedding Guest List</title>
+<style>
 body { font-family: Arial, sans-serif; background: #fff; margin: 0; padding: 0; }
 .container { padding: 10px; max-width: 1000px; margin: auto; }
 .filters-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
@@ -29,46 +24,45 @@ table { display: none; }
 @media (min-width: 769px) {
 .card { display: none; }
 }
-  </style>
-</head><body>
+</style>
+</head>
+<body>
 <div class="container">
-<!-- First row: filter buttons + total pax -->
-<div class="filters-row"> <button onclick="filterGuests('all')">All</button>
-<button onclick="filterGuests('arrived')">Arrived</button> <button onclick="filterGuests('pending')">Pending</button>
 
+<!-- First row: filter buttons + total pax -->
+<div class="filters-row">
+    <button onclick="filterGuests('all')">All</button>
+    <button onclick="filterGuests('arrived')">Arrived</button>
+    <button onclick="filterGuests('pending')">Pending</button>
+    <div id="totalPax" style="margin-left: auto; font-weight: bold;"></div>
 </div>
+
 <!-- Second row: search + clear + revert -->
-<div class="filters-row"> <input id="search" placeholder="Search by guest or table..." oninput="searchGuests()" type="text"> <span class="clear-btn" onclick="clearSearch()">×</span>
-<button onclick="revertAll()">Revert All</button>
+<div class="filters-row">
+    <input id="search" placeholder="Search by guest or table..." oninput="searchGuests()" type="text">
+    <span class="clear-btn" onclick="clearSearch()">×</span>
+    <button onclick="revertAll()">Revert All</button>
 </div>
+
 <table id="guestTable">
-  <thead>
-  <tr>
-    <th>Table No</th>
-    <th>Guest Name</th>
-    <th>Pax</th>
-    <th>Status</th>
-  </tr>
-  </thead>
-  <tbody>
-  </tbody>
+<thead>
+<tr>
+<th>Table No</th>
+<th>Guest Name</th>
+<th>Pax</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody></tbody>
 </table>
 
+<div id="guestCards"></div>
 </div>
 
 <script>
 let guests = [
-  [20, 1, "Boon's Friends - 1"],
-  [20, 1, "Boon's Friends - 2"],
-  [20, 1, "Boon's Friends - 3"],
-  [20, 1, "Boon's Friends - 4"],
-  [20, 1, "Serena's Friends - 1"],
-  [20, 1, "Serena's Friends - 1"],
-  [20, 1, "Serena's Friends - 2"],
-  [20, 1, "Serena's Friends - 3"],
-  [20, 1, "Serena's Friends - 4"],
-  [20, 1, "Serena's Friends - 5"],
-  [20, 1, "Serena's Friends - 6"],
+  [20, 4, "Boon's Friends"],
+  [20, 6, "Serena's Friends"],
   [14, 2, "Ming Ming & Spouse"],
   [14, 2, "Lee Kah Yee & Spouse"],
   [14, 1, "Ming Ming’s Aunty"],
@@ -207,4 +201,5 @@ function clearSearch() {
 // initial render
 updateDisplay();
 </script>
-</body></html>
+</body>
+</html>
