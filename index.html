@@ -6,25 +6,84 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wedding Guest List</title>
 <style>
-    body { font-family: Arial, sans-serif; background: #fff; color: #333; margin: 0; padding: 0; }
-    header { position: sticky; top: 0; background: #fff; z-index: 1000; border-bottom: 1px solid #ccc; }
-    .top-row, .second-row { display: flex; flex-wrap: wrap; align-items: center; padding: 8px; gap: 6px; }
-    button { padding: 6px 12px; border: none; border-radius: 6px; background: #007bff; color: white; cursor: pointer; }
-    button:hover { background: #0056b3; }
-    button.reset { background: #dc3545; }
-    input[type="text"] { padding: 6px; flex: 1; border: 1px solid #ccc; border-radius: 6px; }
-    .guest-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-    .guest-table th, .guest-table td { padding: 8px; border-bottom: 1px solid #ccc; text-align: left; }
-    .cards { display: none; gap: 8px; flex-wrap: wrap; padding: 8px; }
-    .card { border: 1px solid #ccc; border-radius: 8px; padding: 8px; background: #fafafa; width: calc(50% - 8px); box-sizing: border-box; }
-    .status-arrived { color: green; font-weight: bold; }
-    .status-pending { color: orange; font-weight: bold; }
-    @media (max-width: 768px) {
-        .guest-table { display: none; }
-        .cards { display: flex; }
-        .card { width: 100%; }
-        .top-row { justify-content: space-between; }
-        .second-row { width: 100%; }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background-color: white;
+        color: #333;
+    }
+    header {
+        padding: 10px;
+        background: white;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        border-bottom: 1px solid #ddd;
+    }
+    .top-row, .second-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-bottom: 5px;
+    }
+    button {
+        padding: 8px 12px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+    .filter-btn {
+        background-color: gold;
+        color: black;
+    }
+    .reset-btn {
+        background-color: red;
+        color: white;
+    }
+    .revert-btn {
+        background-color: #ccc;
+    }
+    input[type="text"] {
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        flex: 1;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f5f5f5;
+    }
+    .card {
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        background-color: white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .status-btn {
+        padding: 5px 10px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+    .arrived { background-color: #4CAF50; color: white; }
+    .pending { background-color: #f44336; color: white; }
+
+    @media (min-width: 768px) {
+        .card-view { display: none; }
+    }
+    @media (max-width: 767px) {
+        table { display: none; }
     }
 </style>
 </head>
@@ -32,140 +91,102 @@
 
 <header>
     <div class="top-row">
-        <button onclick="filterGuests('all')">All</button>
-        <button onclick="filterGuests('arrived')">Arrived</button>
-        <button onclick="filterGuests('pending')">Pending</button>
-        <span id="totalPax" style="margin-left:auto; font-weight:bold;">Total Pax: 0</span>
+        <button class="filter-btn" onclick="filterGuests('all')">All</button>
+        <button class="filter-btn" onclick="filterGuests('arrived')">Arrived</button>
+        <button class="filter-btn" onclick="filterGuests('pending')">Pending</button>
+        <div id="totalPax" style="margin-left:auto; font-weight:bold;">Total Pax: 0</div>
     </div>
     <div class="second-row">
-        <input type="text" id="searchBox" placeholder="Search guest..." oninput="renderGuests()">
-        <button class="reset" onclick="document.getElementById('searchBox').value=''; renderGuests()">X</button>
-        <button onclick="revertAll()">Revert All</button>
+        <input type="text" id="searchInput" placeholder="Search guest or table..." oninput="searchGuests()">
+        <button class="reset-btn" onclick="resetSearch()">X</button>
+        <button class="revert-btn" onclick="revertAll()">Revert All</button>
     </div>
 </header>
 
-<table class="guest-table">
-    <thead>
-        <tr>
-            <th>Table</th>
-            <th>Guest Name</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody id="guestList"></tbody>
-</table>
-
-<div class="cards" id="guestCards"></div>
+<main>
+    <table id="guestTable">
+        <thead>
+            <tr><th>Table No</th><th>Guest Name</th><th>No of Pax</th><th>Status</th><th>Action</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div id="guestCards" class="card-view"></div>
+</main>
 
 <script>
-const guests = [
-    { table: 20, pax: 4, guestName: "Boon's Friends" },
-    { table: 20, pax: 6, guestName: "Serena's Friends" },
-    { table: 14, pax: 2, guestName: "Ming Ming & Spouse" },
-    { table: 14, pax: 2, guestName: "Lee Kah Yee & Spouse" },
-    { table: 14, pax: 1, guestName: "Ming Ming’s Aunty" },
-    { table: 14, pax: 1, guestName: "Mrs Lim Tua Lek" },
-    { table: 14, pax: 3, guestName: "Nicole Yap & Family" },
-    { table: 8, pax: 2, guestName: "Mr & Mrs Soon Chin Hoon" },
-    { table: 8, pax: 2, guestName: "Ong Ting Ting & Spouse" },
-    { table: 8, pax: 2, guestName: "Mr & Mrs Jesse Jee" },
-    { table: 8, pax: 2, guestName: "Mr & Mrs Lee Peng Koon" },
-    { table: 8, pax: 2, guestName: "Mr & Mrs Loh Hoi Yew" },
-    { table: 2, pax: 2, guestName: "Kian Mun & Daughter" },
-    { table: 2, pax: 1, guestName: "Amy" },
-    { table: 2, pax: 3, guestName: "Benny & Family" },
-    { table: 2, pax: 4, guestName: "Victor & Family" },
-    { table: 21, pax: 1, guestName: "Gurdeu" },
-    { table: 21, pax: 4, guestName: "Jasvin, Annish & Family" },
-    { table: 21, pax: 3, guestName: "Sukhvinder & Family" },
-    { table: 21, pax: 2, guestName: "Dato’ & Datin Jesbil" },
-    { table: 15, pax: 2, guestName: "Mr & Mrs Chan (Joo Heong)" },
-    { table: 15, pax: 1, guestName: "Ricky Chan" },
-    { table: 15, pax: 2, guestName: "Liew Li Fong & Spouse" },
-    { table: 15, pax: 2, guestName: "Tan Ai Tiang & Spouse" },
-    { table: 15, pax: 1, guestName: "Kevin Lau" },
-    { table: 15, pax: 2, guestName: "Mr & Mrs Wong Yok Heng" },
-    { table: 9, pax: 10, guestName: "Seah Kiat Seng & Family" },
-    { table: 3, pax: 3, guestName: "Lay Weng & Family" },
-    { table: 3, pax: 6, guestName: "Carmen & Family" },
-    { table: 3, pax: 1, guestName: "Nancy" },
-    { table: 22, pax: 2, guestName: "Mr & Mrs Loh Weng Cheong" },
-    { table: 22, pax: 2, guestName: "Mr & Mrs Goh Keat Hoe" },
-    { table: 22, pax: 2, guestName: "Mr & Mrs Eric Woh Pei Su" },
-    { table: 22, pax: 2, guestName: "Mr & Mrs Francis Wong" },
-    { table: 22, pax: 1, guestName: "Lim Hong Guan" },
-    { table: 22, pax: 1, guestName: "Ang Sing Hai" },
-    { table: 16, pax: 2, guestName: "Mr & Mrs Sunny Phang" },
-    { table: 16, pax: 1, guestName: "Ms Eng Hui Mun" },
-    { table: 16, pax: 1, guestName: "Ms Tan Yoke Lan" },
-    { table: 16, pax: 2, guestName: "Mr & Mrs Ng Kim Siah" },
-    { table: 16, pax: 2, guestName: "Mr & Mrs Yap Meow Sing" },
-    { table: 16, pax: 2, guestName: "Mr & Mrs Lim Tow Poe" },
-    { table: 10, pax: 1, guestName: "Ms Soo Kah Huey" },
-    { table: 10, pax: 2, guestName: "Dato’ & Datin Soo Kah Eng" },
-    { table: 10, pax: 2, guestName: "Dato’ & Datin Lew Wai Koung" },
-    { table: 10, pax: 1, guestName: "Datin Toh Bee Huan" },
-    { table: 10, pax: 2, guestName: "Mr & Mrs Soo Hock Chuan" },
-    { table: 10, pax: 1, guestName: "Mdm Lau Yoke Eng" },
-    { table: 10, pax: 1, guestName: "Mdm Isabelle Fam" },
-    { table: 4, pax: 4, guestName: "Shirley & Family" },
-    { table: 4, pax: 1, guestName: "Annie" },
-    { table: 4, pax: 1, guestName: "Ruby" },
-    { table: 4, pax: 2, guestName: "Amy Tiew & Ah Ngoh" },
-    { table: 4, pax: 2, guestName: "Mr & Mrs Sunny Tiew" }
+const guestData = [
+    {table:20, pax:4, name:"Boon's Friends"},
+    {table:20, pax:6, name:"Serena's Friends"},
+    {table:14, pax:2, name:"Ming Ming & Spouse"},
+    {table:14, pax:2, name:"Lee Kah Yee & Spouse"},
+    {table:14, pax:1, name:"Ming Ming’s Aunty"},
+    {table:14, pax:1, name:"Mrs Lim Tua Lek"},
+    {table:14, pax:3, name:"Nicole Yap & Family"},
+    {table:8, pax:2, name:"Mr & Mrs Soon Chin Hoon"},
+    {table:8, pax:2, name:"Ong Ting Ting & Spouse"}
 ];
 
-let statusMap = JSON.parse(localStorage.getItem('guestStatus')) || {};
+let guestStatus = JSON.parse(localStorage.getItem('guestStatus')) || {};
 
-function renderGuests(filter = currentFilter) {
-    const searchValue = document.getElementById('searchBox').value.toLowerCase();
-    const guestList = document.getElementById('guestList');
-    const guestCards = document.getElementById('guestCards');
-    guestList.innerHTML = '';
-    guestCards.innerHTML = '';
+function renderGuests(filter='all', search='') {
+    const tbody = document.querySelector('#guestTable tbody');
+    const cardContainer = document.getElementById('guestCards');
+    tbody.innerHTML = '';
+    cardContainer.innerHTML = '';
     let totalPax = 0;
-    guests.forEach(guest => {
-        const status = statusMap[guest.guestName] || 'pending';
-        if ((filter === 'arrived' && status !== 'arrived') ||
-            (filter === 'pending' && status !== 'pending')) return;
-        if (!guest.guestName.toLowerCase().includes(searchValue) &&
-            !String(guest.table).includes(searchValue)) return;
-        totalPax += guest.pax;
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${guest.table}</td><td>${guest.guestName} (Pax: ${guest.pax})</td>
-                         <td class="status-${status}">${status}</td>
-                         <td><button onclick="updateStatus('${guest.guestName}')">Arrived</button></td>`;
-        guestList.appendChild(row);
+
+    guestData.forEach(g => {
+        const status = guestStatus[g.name] || 'pending';
+        if (filter !== 'all' && status !== filter) return;
+        if (search && !g.name.toLowerCase().includes(search) && g.table.toString() !== search) return;
+        totalPax += g.pax;
+
+        // Table row
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${g.table}</td>
+                        <td>${g.name} (Pax: ${g.pax})</td>
+                        <td>${g.pax}</td>
+                        <td>${status.charAt(0).toUpperCase() + status.slice(1)}</td>
+                        <td><button class="status-btn ${status}" onclick="toggleStatus('${g.name}')">${status === 'pending' ? 'Arr' : 'Pend'}</button></td>`;
+        tbody.appendChild(tr);
+
+        // Mobile card
         const card = document.createElement('div');
         card.className = 'card';
-        card.innerHTML = `<div><strong>Table ${guest.table}</strong></div>
-                          <div>${guest.guestName} (Pax: ${guest.pax})</div>
-                          <div class="status-${status}">${status}</div>
-                          <button onclick="updateStatus('${guest.guestName}')">Arrived</button>`;
-        guestCards.appendChild(card);
+        card.innerHTML = `<strong>Table ${g.table}</strong><br>${g.name} (Pax: ${g.pax})<br>
+                          <button class="status-btn ${status}" onclick="toggleStatus('${g.name}')">${status === 'pending' ? 'Arr' : 'Pend'}</button>`;
+        cardContainer.appendChild(card);
     });
-    document.getElementById('totalPax').textContent = `Total Pax: ${totalPax}`;
+    document.getElementById('totalPax').innerText = `Total Pax: ${totalPax}`;
 }
 
-function updateStatus(name) {
-    statusMap[name] = 'arrived';
-    localStorage.setItem('guestStatus', JSON.stringify(statusMap));
-    renderGuests();
+function filterGuests(status) {
+    currentFilter = status;
+    renderGuests(status, document.getElementById('searchInput').value.toLowerCase());
+}
+
+function searchGuests() {
+    renderGuests(currentFilter, document.getElementById('searchInput').value.toLowerCase());
+}
+
+function resetSearch() {
+    document.getElementById('searchInput').value = '';
+    renderGuests(currentFilter);
+}
+
+function toggleStatus(name) {
+    guestStatus[name] = guestStatus[name] === 'arrived' ? 'pending' : 'arrived';
+    localStorage.setItem('guestStatus', JSON.stringify(guestStatus));
+    renderGuests(currentFilter, document.getElementById('searchInput').value.toLowerCase());
 }
 
 function revertAll() {
-    statusMap = {};
+    guestStatus = {};
     localStorage.removeItem('guestStatus');
-    renderGuests();
+    renderGuests(currentFilter);
 }
 
 let currentFilter = 'all';
-function filterGuests(type) {
-    currentFilter = type;
-    renderGuests();
-}
-
 renderGuests();
 </script>
 
