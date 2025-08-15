@@ -1,12 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html><head>
-  <meta charset="UTF-8">
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wedding Guest List</title>
-
-
-  <style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wedding Guest List</title>
+<style>
 body { font-family: Arial, sans-serif; background: #fff; margin: 0; padding: 0; }
 .container { padding: 10px; max-width: 1000px; margin: auto; }
 .filters-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
@@ -26,18 +24,19 @@ table { display: none; }
 @media (min-width: 769px) {
 .card { display: none; }
 }
-  </style>
-</head><body>
+</style>
+</head>
+<body>
 <div class="container">
 <div class="filters-row">
     <button onclick="filterGuests('all')">All</button>
     <button onclick="filterGuests('arrived')">Arrived</button>
     <button onclick="filterGuests('pending')">Pending</button>
-    
+    <div id="totalPax" style="margin-left: auto; font-weight: bold;"></div>
 </div>
 <div class="filters-row">
     <input id="search" placeholder="Search by guest or table..." oninput="searchGuests()" type="text">
-    <span class="clear-btn" onclick="clearSearch()">�</span>
+    <span class="clear-btn" onclick="clearSearch()">×</span>
     <button onclick="revertAll()">Revert All</button>
 </div>
 <table id="guestTable">
@@ -51,9 +50,8 @@ table { display: none; }
 </thead>
 <tbody></tbody>
 </table>
-
+<div id="guestCards"></div>
 </div>
-
 <script>
 let guests = [
   [11, 2, "Mr & Mrs Choong Chilun"],
@@ -65,7 +63,7 @@ let guests = [
   [11, 1, "Chong Yuen Xin"],
   [8, 2, "Ming Ming & Spouse"],
   [8, 2, "Lee Kah Yee & Spouse"],
-  [8, 1, "Ming Ming&#8217;s Aunty"],
+  [8, 1, "Ming Ming’s Aunty"],
   [8, 1, "Mrs Lim Tua Lek"],
   [8, 3, "Nicole Yap & Family"],
   [5, 2, "Mr & Mrs Soon Chin Hoon"],
@@ -80,7 +78,7 @@ let guests = [
   [12, 1, "Gurdeu"],
   [12, 4, "Jasvin, Annish & Family"],
   [12, 3, "Sukhvinder & Family"],
-  [12, 2, "Dato&#8217; & Datin Jesbil"],
+  [12, 2, "Dato’ & Datin Jesbil"],
   [9, 1, "Ricky Chan"],
   [9, 2, "Liew Li Fong & Spouse"],
   [9, 2, "Tan Ai Tiang & Spouse"],
@@ -104,8 +102,8 @@ let guests = [
   [10, 2, "Mr & Mrs Lim Tow Poe"],
   [10, 2, "Mr & Mrs Lee Peng Koon"],
   [7, 1, "Ms Soo Kah Huey"],
-  [7, 2, "Dato&#8217; & Datin Soo Kah Eng"],
-  [7, 2, "Dato&#8217; & Datin Lew Wai Koung"],
+  [7, 2, "Dato’ & Datin Soo Kah Eng"],
+  [7, 2, "Dato’ & Datin Lew Wai Koung"],
   [7, 1, "Datin Toh Bee Huan"],
   [7, 2, "Mr & Mrs Soo Hock Chuan"],
   [7, 1, "Mdm Lau Yoke Eng"],
@@ -153,4 +151,5 @@ function searchGuests() { updateDisplay(); }
 function clearSearch() { document.getElementById('search').value = ''; updateDisplay(); }
 updateDisplay();
 </script>
-</body></html>
+</body>
+</html>
